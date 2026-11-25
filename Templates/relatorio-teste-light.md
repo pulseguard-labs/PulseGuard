@@ -15,7 +15,7 @@
 
 ## Configuração sob teste
 
-- **Preset ou parâmetros relevantes:** `preset-template-60R-light-v2` — pendente de teste manual.
+- **Preset ou parâmetros relevantes:** `preset-template-60R-light-v0.1.0` — pendente de teste manual.
 - **`EnableAutomaticTrading`:** `false`
 - **`ConfirmAutomaticRisk`:**
 - **`AllowLiveTrading`:** `false`

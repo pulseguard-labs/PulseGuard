@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "packageVersion": "0.1.0",
+  "components": {
+    "indicator": {
+      "version": "0.1.0",
+      "minRequired": {}
+    },
+    "strategy": {
+      "version": "0.1.0",
+      "minRequired": {
+        "indicator": "0.1.0"
+      }
+    },
+    "template": {
+      "version": "0.1.0",
+      "minRequired": {}
+    }
+  },
+  "releaseNotesUrl": "https://github.com/pulseguard-labs/PulseGuard/releases",
+  "published": "2026-11-25"
+}

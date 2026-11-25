@@ -176,6 +176,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private readonly object csvQueueLock = new object();
 		private string logFilePath;
 		private Task csvWriteTask = Task.FromResult(0);
+		private volatile PulseGuardUpdateResult strategyVersionResult;
+		private volatile PulseGuardUpdateResult indicatorVersionResult;
+		private volatile PulseGuardUpdateResult templateVersionResult;
 
 		protected override void OnStateChange()
 		{
@@ -264,6 +267,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				TamanhoFontePainel			= 14;
 				OpacidadeFundoPainel		= 94;
 				CorFundoPainel				= new SolidColorBrush(Color.FromRgb(13, 20, 32));
+				CheckForUpdates				= true;
+				ShowVersionPanel			= true;
+				TemplateVersion				= "informado manualmente";
 
 				EnableSoundAlerts			= true;
 				EnableCsvLog				= true;
@@ -293,7 +299,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				barTimeZone = NinjaTrader.Core.Globals.GeneralOptions.TimeZoneInfo;
 				easternTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 				macd = MACDNG(FastPeriod, SlowPeriod, SignalPeriod, true, NormalizationPeriod,
-					40.0, 60.0, 0.25, 40, 20, -20, -40);
+					40.0, 60.0, 0.25, CheckForUpdates, 40, 20, -20, -40);
 				emaFast = EMA(FastEmaPeriod);
 				smaMedium = SMA(MediumSmaPeriod);
 				emaMacro = EMA(MacroEmaPeriod);
@@ -315,6 +321,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					AddChartIndicator(smaMedium);
 					AddChartIndicator(emaMacro);
 					AddChartIndicator(macd);
+					CheckComponentVersions();
 				}
 			}
 			else if (State == State.Realtime)
@@ -1478,6 +1485,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 			double targetRemaining = MaxDailyProfit > 0
 				? Math.Max(0, MaxDailyProfit - currentSessionPnl) : 0;
+			string[] versionRows = BuildVersionRows();
+			Brush[] versionBrushes = BuildVersionBrushes();
 			string[] rows =
 			{
 				"PulseGuard · " + BarsPeriod.BarsPeriodType + " " + BarsPeriod.Value
@@ -1506,7 +1515,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				"DLL: " + (DailyLossLimitEnabled ? FormatAmount(DailyLossLimitAmount) : "OFF")
 					+ " · MLL: " + (MaximumLossLimitEnabled
 						? FormatAmount(MllRemainingRoom) : "OFF")
-					+ " · Máx.: " + activeSessionContractLimit + " contratos"
+					+ " · Máx.: " + activeSessionContractLimit + " contratos",
+				versionRows[0],
+				versionRows[1],
+				versionRows[2],
+				versionRows[3],
+				versionRows[4],
+				versionRows[5]
 			};
 			Brush[] rowBrushes =
 			{
@@ -1519,9 +1534,223 @@ namespace NinjaTrader.NinjaScript.Strategies
 					? Brushes.OrangeRed : Brushes.LightSteelBlue,
 				Brushes.DeepSkyBlue, accountRealizedPnl >= 0 ? Brushes.LimeGreen : Brushes.OrangeRed,
 				Brushes.LightSteelBlue, currentSessionPnl >= 0 ? Brushes.LimeGreen : Brushes.OrangeRed,
-				Brushes.LightSteelBlue, Brushes.LightSteelBlue
+				Brushes.LightSteelBlue, Brushes.LightSteelBlue, Brushes.LightSteelBlue,
+				versionBrushes[0], versionBrushes[1], versionBrushes[2],
+				versionBrushes[3], versionBrushes[4], versionBrushes[5]
 			};
 			QueueCompactDashboardUpdate(rows, rowBrushes, decisionBrush);
+		}
+
+		private string[] BuildVersionRows()
+		{
+			return new string[]
+			{
+				"VERSÕES E ATUALIZAÇÕES",
+				BuildVersionRow("Robô", PulseGuardVersion.Strategy, strategyVersionResult),
+				BuildVersionRow("Indicador", PulseGuardVersion.Indicator, indicatorVersionResult),
+				BuildVersionRow("Template", TemplateVersion, templateVersionResult),
+				"Build: " + PulseGuardVersion.BuildDate + " · Commit: " + PulseGuardVersion.Commit
+					+ " · Verificação local: " + GetLastVersionCheckTime(),
+				GetVersionGuidance()
+			};
+		}
+
+		private Brush[] BuildVersionBrushes()
+		{
+			return new Brush[]
+			{
+				Brushes.DeepSkyBlue,
+				GetVersionStatusBrush(strategyVersionResult),
+				GetVersionStatusBrush(indicatorVersionResult),
+				GetVersionStatusBrush(templateVersionResult),
+				Brushes.LightSteelBlue,
+				GetVersionGuidanceBrush()
+			};
+		}
+
+		private static string BuildVersionRow(string label, string localVersion,
+			PulseGuardUpdateResult result)
+		{
+			string installed = string.IsNullOrWhiteSpace(localVersion)
+				? "informado manualmente" : localVersion;
+			string latest = result == null || string.IsNullOrWhiteSpace(result.LatestVersion)
+				? "—" : result.LatestVersion;
+			return label + ": " + installed + " · GitHub " + latest + " · "
+				+ GetVersionStatusText(result);
+		}
+
+		private static string GetVersionStatusText(PulseGuardUpdateResult result)
+		{
+			if (result == null)
+				return "Não verificado";
+
+			switch (result.Status)
+			{
+				case PulseGuardUpdateStatus.Atualizado:
+					return "Atualizado";
+				case PulseGuardUpdateStatus.AtualizacaoDisponivel:
+					return "Atualização disponível";
+				case PulseGuardUpdateStatus.LocalMaisNovo:
+					return result.Reason == "Versão local de desenvolvimento."
+						? "Local mais nova (dev)" : "Local mais nova";
+				case PulseGuardUpdateStatus.Incompativel:
+					return "Incompatível";
+				case PulseGuardUpdateStatus.Desligado:
+					return "Desligado";
+				default:
+					return "Não verificado";
+			}
+		}
+
+		private static Brush GetVersionStatusBrush(PulseGuardUpdateResult result)
+		{
+			if (result == null)
+				return Brushes.LightGray;
+
+			switch (result.Status)
+			{
+				case PulseGuardUpdateStatus.Atualizado:
+					return Brushes.LimeGreen;
+				case PulseGuardUpdateStatus.AtualizacaoDisponivel:
+					return Brushes.Goldenrod;
+				case PulseGuardUpdateStatus.LocalMaisNovo:
+					return Brushes.LightSkyBlue;
+				case PulseGuardUpdateStatus.Incompativel:
+					return Brushes.OrangeRed;
+				case PulseGuardUpdateStatus.Desligado:
+				case PulseGuardUpdateStatus.NaoVerificado:
+				default:
+					return Brushes.LightGray;
+			}
+		}
+
+		private string GetVersionGuidance()
+		{
+			PulseGuardUpdateResult[] results =
+			{
+				strategyVersionResult, indicatorVersionResult, templateVersionResult
+			};
+			foreach (PulseGuardUpdateResult result in results)
+			{
+				if (result != null && result.Status == PulseGuardUpdateStatus.Incompativel)
+					return "Incompatível: atualize os componentes necessários em "
+						+ GetReleaseNotesUrl(result) + ".";
+			}
+			foreach (PulseGuardUpdateResult result in results)
+			{
+				if (result != null && result.Status == PulseGuardUpdateStatus.AtualizacaoDisponivel)
+					return "Atualização disponível: consulte " + GetReleaseNotesUrl(result) + ".";
+			}
+			return "";
+		}
+
+		private Brush GetVersionGuidanceBrush()
+		{
+			PulseGuardUpdateResult[] results =
+			{
+				strategyVersionResult, indicatorVersionResult, templateVersionResult
+			};
+			foreach (PulseGuardUpdateResult result in results)
+			{
+				if (result != null && result.Status == PulseGuardUpdateStatus.Incompativel)
+					return Brushes.OrangeRed;
+			}
+			foreach (PulseGuardUpdateResult result in results)
+			{
+				if (result != null && result.Status == PulseGuardUpdateStatus.AtualizacaoDisponivel)
+					return Brushes.Goldenrod;
+			}
+			return Brushes.LightSteelBlue;
+		}
+
+		private static string GetReleaseNotesUrl(PulseGuardUpdateResult result)
+		{
+			return result == null || string.IsNullOrWhiteSpace(result.ReleaseNotesUrl)
+				? "GitHub Releases" : result.ReleaseNotesUrl;
+		}
+
+		private string GetLastVersionCheckTime()
+		{
+			DateTime? lastChecked = null;
+			PulseGuardUpdateResult[] results =
+			{
+				strategyVersionResult, indicatorVersionResult, templateVersionResult
+			};
+			foreach (PulseGuardUpdateResult result in results)
+			{
+				if (result != null && result.CheckedAt.HasValue
+					&& (!lastChecked.HasValue || result.CheckedAt.Value > lastChecked.Value))
+					lastChecked = result.CheckedAt;
+			}
+			if (!lastChecked.HasValue && !CheckForUpdates)
+				return "desligada";
+			return lastChecked.HasValue
+				? lastChecked.Value.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)
+				: "aguardando";
+		}
+
+		private async void CheckComponentVersions()
+		{
+			try
+			{
+				Task<PulseGuardUpdateResult>[] checks =
+				{
+					PulseGuardUpdateChecker.CheckAsync(PulseGuardComponent.Strategy,
+						PulseGuardVersion.Strategy, PulseGuardVersion.Indicator, CheckForUpdates),
+					PulseGuardUpdateChecker.CheckAsync(PulseGuardComponent.Indicator,
+						PulseGuardVersion.Indicator, PulseGuardVersion.Indicator, CheckForUpdates),
+					PulseGuardUpdateChecker.CheckAsync(PulseGuardComponent.Template,
+						TemplateVersion, PulseGuardVersion.Indicator, CheckForUpdates)
+				};
+				await Task.WhenAll(checks).ConfigureAwait(false);
+				strategyVersionResult = checks[0].Result;
+				indicatorVersionResult = checks[1].Result;
+				templateVersionResult = checks[2].Result;
+				Print("PulseGuard version check: robô " + GetVersionStatusText(strategyVersionResult)
+					+ ", indicador " + GetVersionStatusText(indicatorVersionResult)
+					+ ", template " + GetVersionStatusText(templateVersionResult) + ".");
+				QueueVersionPanelRefresh();
+			}
+			catch (Exception exception)
+			{
+				PulseGuardUpdateResult failed = new PulseGuardUpdateResult(
+					PulseGuardUpdateStatus.NaoVerificado, null,
+					exception.GetType().Name, null, DateTime.Now);
+				strategyVersionResult = failed;
+				indicatorVersionResult = failed;
+				templateVersionResult = failed;
+				Print("PulseGuard version check: Não verificado.");
+				QueueVersionPanelRefresh();
+			}
+		}
+
+		private void QueueVersionPanelRefresh()
+		{
+			if (ChartControl == null || ChartControl.Dispatcher.HasShutdownStarted
+				|| ChartControl.Dispatcher.HasShutdownFinished)
+				return;
+
+			ChartControl.Dispatcher.InvokeAsync((Action)(() =>
+			{
+				if (State == State.Terminated)
+					return;
+
+				if (dashboardRows != null && dashboardRows.Length >= 22)
+				{
+					string[] rows = BuildVersionRows();
+					Brush[] brushes = BuildVersionBrushes();
+					for (int i = 0; i < rows.Length; i++)
+					{
+						int rowIndex = i + 16;
+						dashboardRows[rowIndex].Text = rows[i];
+						dashboardRows[rowIndex].Foreground = brushes[i];
+						dashboardRows[rowIndex].Visibility = !ShowVersionPanel
+							|| (i == 5 && string.IsNullOrWhiteSpace(rows[i]))
+							? Visibility.Collapsed : Visibility.Visible;
+					}
+				}
+				ForceRefresh();
+			}));
 		}
 
 		private void QueueCompactDashboardUpdate(string[] rows, Brush[] rowBrushes, Brush accentBrush)
@@ -1572,10 +1801,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 					dashboardRows[i].Foreground = brushesToApply[i];
 					dashboardRows[i].FontSize = i == 0 ? TamanhoFontePainel + 1
 						: (i == 1 ? TamanhoFontePainel + 2
-							: (i == 3 || i == 6 || i == 9 ? TamanhoFontePainel : TamanhoFontePainel - 1));
-					bool section = i == 3 || i == 6 || i == 9;
-					dashboardRows[i].Visibility = ModoPainel == PulseGuardDashboardMode.Detailed || !section
-						? Visibility.Visible : Visibility.Collapsed;
+							: (i == 3 || i == 6 || i == 9 || i == 16
+								? TamanhoFontePainel : TamanhoFontePainel - 1));
+					bool section = i == 3 || i == 6 || i == 9 || i == 16;
+					if (i >= 16)
+						dashboardRows[i].Visibility = !ShowVersionPanel
+							|| (i == 21 && string.IsNullOrWhiteSpace(rowsToApply[i]))
+							? Visibility.Collapsed : Visibility.Visible;
+					else
+						dashboardRows[i].Visibility = ModoPainel == PulseGuardDashboardMode.Detailed || !section
+							? Visibility.Visible : Visibility.Collapsed;
 					if (section)
 						dashboardRows[i].Foreground = Brushes.DeepSkyBlue;
 				}
@@ -1617,7 +1852,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			dashboardRows = new TextBlock[rowCount];
 			for (int i = 0; i < dashboardRows.Length; i++)
 			{
-				bool section = i == 3 || i == 6 || i == 9;
+				bool section = i == 3 || i == 6 || i == 9 || i == 16;
 				TextBlock row = new TextBlock
 				{
 					FontFamily = new FontFamily("Segoe UI"),
@@ -2673,6 +2908,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[NinjaScriptProperty]
 		[Display(Name = "Mostrar painel informativo", GroupName = "8. Painel informativo", Order = 1)]
 		public bool MostrarPainel { get; set; }
+
+		[NinjaScriptProperty]
+		[Display(Name = "Check for updates", Description = "Desliga as consultas do robô, do indicador MACDNG incluído e do template.", GroupName = "9. Version information", Order = 1)]
+		public bool CheckForUpdates { get; set; }
+
+		[NinjaScriptProperty]
+		[Display(Name = "Show version panel", GroupName = "9. Version information", Order = 2)]
+		public bool ShowVersionPanel { get; set; }
+
+		[NinjaScriptProperty]
+		[Display(Name = "Template version (manual)", Description = "Preencha a versão do template aplicado; o NinjaTrader não a detecta automaticamente.", GroupName = "9. Version information", Order = 3)]
+		public string TemplateVersion { get; set; }
 
 		[NinjaScriptProperty]
 		[Display(Name = "Modo do painel", GroupName = "8. Painel informativo", Order = 2)]

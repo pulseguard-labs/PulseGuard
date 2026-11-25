@@ -24,6 +24,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 		private EMA				emaSignalNorm;		// Signal do MACD já normalizado (quando Normalize = true)
 		private Series<double>	macdSeries;
 		private Series<double>	normMacdSeries;
+		private bool updateCheckStarted;
 
 		protected override void OnStateChange()
 		{
@@ -53,6 +54,7 @@ namespace NinjaTrader.NinjaScript.Indicators
 				CompressionThreshold		= 40.0;
 				DisplayScaleLimit			= 60.0;
 				SignalCloseness				= 0.25;
+				CheckForUpdates				= true;
 
 				// Plots (linhas principais)
 				AddPlot(new Stroke(Brushes.ForestGreen, 2), PlotStyle.Line, "MACDLine");
@@ -74,6 +76,30 @@ namespace NinjaTrader.NinjaScript.Indicators
 
 				emaSignalRaw	= EMA(macdSeries, Smooth);		// usado quando Normalize = false
 				emaSignalNorm	= EMA(normMacdSeries, Smooth);	// usado quando Normalize = true
+				if (!updateCheckStarted)
+				{
+					updateCheckStarted = true;
+					CheckIndicatorVersion();
+				}
+			}
+		}
+
+		private async void CheckIndicatorVersion()
+		{
+			try
+			{
+				PulseGuardUpdateResult result = await PulseGuardUpdateChecker.CheckAsync(
+					PulseGuardComponent.Indicator, PulseGuardVersion.Indicator,
+					PulseGuardVersion.Indicator, CheckForUpdates).ConfigureAwait(false);
+				string latest = string.IsNullOrWhiteSpace(result.LatestVersion)
+					? "" : " · GitHub " + result.LatestVersion;
+				Print("PulseGuard MACDNG " + PulseGuardVersion.Indicator
+					+ " · " + result.Status + latest + ".");
+			}
+			catch (Exception exception)
+			{
+				Print("PulseGuard MACDNG " + PulseGuardVersion.Indicator
+					+ " · Não verificado (" + exception.GetType().Name + ").");
 			}
 		}
 
@@ -206,6 +232,10 @@ namespace NinjaTrader.NinjaScript.Indicators
 		[Range(0.0, 0.8)]
 		[Display(Name = "Signal Closeness", Description = "Aproxima a linha de sinal (0 = EMA pura, maior = mais próxima do MACD)", Order = 5, GroupName = "2. Normalization & Precision")]
 		public double SignalCloseness { get; set; }
+
+		[NinjaScriptProperty]
+		[Display(Name = "Check for updates", Description = "Consulta apenas o manifesto público; não baixa nem instala arquivos.", Order = 1, GroupName = "4. Version information")]
+		public bool CheckForUpdates { get; set; }
 
 		[NinjaScriptProperty]
 		[Display(Name = "Overbought Extreme", Description = "Nível de Sobrecompra Extrema", Order = 1, GroupName = "3. Horizontal Levels")]

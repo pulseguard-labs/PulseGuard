@@ -4,9 +4,9 @@
 
 ## Identificação
 
-- **Nome do preset:** `preset-template-60R-dark`
+- **Nome do preset:** `preset-template-60R-dark-v0.1.0`
 - **Objetivo e público:** Variante visual escura do template Renko 60; uso somente em Playback/Sim101.
-- **Versão/commit do PulseGuard:** A validar
+- **Versão/commit do PulseGuard:** template `0.1.0` / build a validar
 - **Versão NinjaTrader 8:**
 - **Responsável e data:** A validar / 2026-11-25
 

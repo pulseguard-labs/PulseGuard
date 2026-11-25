@@ -4,8 +4,9 @@ Estes arquivos são templates visuais para NinjaTrader 8, destinados exclusivame
 
 ## Arquivos
 
-- `preset-template-60R-light-v2.xml` e `.xtpl`: tema claro aprimorado.
-- `preset-template-60R-dark.xml` e `.xtpl`: tema escuro equivalente.
+- `preset-template-60R-light-v0.1.0.xml` e `.xtpl`: tema claro aprimorado, baseado na revisão visual v2.
+- `preset-template-60R-dark-v0.1.0.xml` e `.xtpl`: tema escuro equivalente.
+- `preset-template-60R-light.xml`: arquivo legado sem versão, mantido apenas como referência; não é o template ativo.
 - `backup/preset-template-60R-light.original.xml`: cópia byte a byte do original.
 - `AUDITORIA.md`, `PENDENCIAS.md` e `diff-light-dark.md`: achados, pendências e diff controlado.
 
@@ -14,8 +15,8 @@ Os `.xml` são a fonte de verdade para versionamento e revisão de diff. Os `.xt
 ## Instalação e uso
 
 1. Copie o `.xtpl` desejado para `Documents\NinjaTrader 8\templates\Chart\`.
-2. No NinjaTrader 8, abra um gráfico MNQ Renko 60 em Playback/Sim101 e aplique o template pelo menu **Templates**.
+2. No NinjaTrader 8, abra um gráfico em Playback/Sim101 e aplique o template pelo menu **Templates**.
 3. Para alternar de tema, aplique o arquivo claro ou escuro ao mesmo gráfico.
 4. Faça o checklist manual em `PENDENCIAS.md` antes de considerar o template validado.
 
-O instrumento exportado é MNQ DEC26; em rollover, selecione o contrato correto no próprio NinjaTrader 8. ATM `100-200`, quantidade `1` e TIF `Day` foram preservados. Não há indicadores no template até que seja fornecido um export real do MACD.
+O XML é a fonte de verdade; o `.xtpl` correspondente deve permanecer idêntico. Os nomes SemVer representam a versão do componente template, não uma exigência de instrumento ou de série de barras. ATM `100-200`, quantidade `1` e TIF `Day` foram preservados. Não há indicadores no template até que seja fornecido um export real do MACD. A estratégia apresenta `TemplateVersion` como informado manualmente; não há detecção automática do template aplicado.

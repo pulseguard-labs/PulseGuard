@@ -4,9 +4,9 @@
 
 ## Identificação
 
-- **Nome do preset:** `preset-template-60R-light-v2`
+- **Nome do preset:** `preset-template-60R-light-v0.1.0`
 - **Objetivo e público:** Template visual claro para gráfico Renko 60 no NinjaTrader 8; uso somente em Playback/Sim101.
-- **Versão/commit do PulseGuard:** A validar
+- **Versão/commit do PulseGuard:** template `0.1.0` / build a validar
 - **Versão NinjaTrader 8:**
 - **Responsável e data:** A validar / 2026-11-25
 
