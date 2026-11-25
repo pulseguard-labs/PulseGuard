@@ -13,5 +13,5 @@ jobs:
         shell: pwsh
         run: ./scripts/check-versions.ps1
       - name: Test SemVer and manifest parser
-        shell: pwsh
+        shell: powershell
         run: ./scripts/test-versioning.ps1
