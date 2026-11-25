@@ -5,7 +5,9 @@ if (-not (Test-Path -LiteralPath $framework)) {
     $framework = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319'
 }
 $references = @(
+    (Join-Path $framework 'mscorlib.dll'),
     (Join-Path $framework 'System.dll'),
+    (Join-Path $framework 'System.Core.dll'),
     (Join-Path $framework 'System.Net.Http.dll'),
     (Join-Path $framework 'System.Web.Extensions.dll')
 )
