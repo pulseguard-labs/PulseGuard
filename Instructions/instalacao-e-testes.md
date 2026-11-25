@@ -49,6 +49,6 @@ A compilação no editor NinjaScript e o comportamento em Replay/Sim101 dependem
 
 ## Validação do verificador de versões
 
-Execute `scripts/check-versions.ps1` e `scripts/test-versioning.ps1` para validar manifesto, SemVer e parser. A URL consulta somente `version.json` público em `main`; até esse arquivo ser publicado, ou se a rede estiver indisponível, o status esperado é “Não verificado”. A requisição tem timeout de 5 segundos, cache compartilhado de 15 minutos, TLS 1.2 no handler e não baixa nem instala software.
+Execute `scripts/check-versions.ps1` e `scripts/test-versioning.ps1` para validar manifesto, SemVer e parser. A URL consulta somente `version.json` público na branch padrão configurada (`feat/versioning` atualmente); se a rede estiver indisponível, o status esperado é “Não verificado”. A requisição tem timeout de 5 segundos, cache compartilhado de 15 minutos, TLS 1.2 no handler e não baixa nem instala software.
 
 Faça os casos de Playback/Sim101 descritos em [`../Tests/roteiro-sim101.md`](../Tests/roteiro-sim101.md). A checagem começa em `State.DataLoaded`, não é executada a cada barra e não deve modificar nem atrasar ordens. A compilação NinjaScript e o teste visual em tema claro/escuro continuam pendentes de validação manual local.

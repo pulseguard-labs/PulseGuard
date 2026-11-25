@@ -57,7 +57,7 @@ Somente depois de concluir e registrar as etapas anteriores:
 ## 7. Verificação de versão (informativa)
 
 Execute esta seção apenas em Playback/Sim101 e sem alterar os padrões de segurança. A consulta deve afetar somente o texto exibido/logado, nunca ordens.
-O repositório público ainda não tem `version.json` publicado em `main`; os cenários online devem ser repetidos após a publicação desse manifesto.
+O manifesto está publicado na branch padrão atual `feat/versioning`; confirme que o status online é “Atualizado”.
 
 - [ ] Online, manifesto válido e versões iguais: status “Atualizado”.
 - [ ] Em ambiente de teste isolado, manifesto com versão superior: status “Atualização disponível” e orientação para consultar Releases.

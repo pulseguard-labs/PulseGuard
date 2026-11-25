@@ -16,10 +16,10 @@ Use `MAJOR.MINOR.PATCH`, com sufixo de pré-lançamento opcional:
 2. Atualize `packageVersion` e os componentes correspondentes em `version.json`, incluindo `minRequired` quando uma versão mínima for necessária.
 3. Atualize a primeira entrada do `CHANGELOG.md` com a versão do pacote e a data de publicação.
 4. Execute `./scripts/check-versions.ps1` e `./scripts/test-versioning.ps1`.
-5. Revise e integre as alterações na branch pública configurada (`main`).
+5. Revise e integre as alterações na branch pública configurada (`feat/versioning` atualmente).
 6. Crie a tag do pacote no formato `v<MAJOR>.<MINOR>.<PATCH>` e publique a release com as notas correspondentes ao `CHANGELOG.md`.
 
-O verificador do NinjaTrader lê somente o texto de `version.json` na branch `main`. Ele só verá a nova versão depois que esse manifesto estiver publicado nessa branch. A página de releases é informativa; o checker não baixa arquivos, não instala código e não executa conteúdo remoto.
+O verificador do NinjaTrader lê somente o texto de `version.json` na branch pública configurada — atualmente `feat/versioning`, que o GitHub informa como branch padrão do repositório. Atualize a URL em `PulseGuardUpdateChecker` e esta documentação se a branch padrão mudar. A página de releases é informativa; o checker não baixa arquivos, não instala código e não executa conteúdo remoto.
 
 ## Instalação no NinjaTrader 8
 

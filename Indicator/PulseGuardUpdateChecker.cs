@@ -83,7 +83,7 @@ namespace NinjaTrader.NinjaScript
 	public static class PulseGuardUpdateChecker
 	{
 		private const string ManifestUrl =
-			"https://raw.githubusercontent.com/pulseguard-labs/PulseGuard/main/version.json";
+			"https://raw.githubusercontent.com/pulseguard-labs/PulseGuard/feat/versioning/version.json";
 		private const int TimeoutMilliseconds = 5000;
 		private const int MaximumManifestBytes = 16384;
 		private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(15);

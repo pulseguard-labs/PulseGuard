@@ -26,7 +26,7 @@ Os templates atuais não têm versão SemVer nos nomes. A documentação local i
 ## Repositório e publicação
 
 - `origin`: `https://github.com/pulseguard-labs/PulseGuard.git`.
-- O endpoint público do GitHub informa visibilidade `public` e branch padrão configurada como `main`.
+- Na consulta inicial do levantamento, o endpoint público do GitHub informou visibilidade `public` e branch padrão `main`. Após o primeiro push da branch `feat/versioning`, o GitHub passou a informá-la como branch padrão; o verificador e a documentação de release usam essa branch atualmente.
 - Na consulta do levantamento, o GitHub não listava branches, tags ou releases; a página de releases informava que ainda não havia releases.
 - A cópia local tinha a branch `refactor/pulseguard-structure`, sem tags locais. A branch de trabalho `feat/versioning` foi criada a partir dela após concluir a leitura.
 - A cópia local já continha alterações não commitadas em `README.md` e `.gitignore`; elas foram preservadas e não fazem parte deste levantamento.
