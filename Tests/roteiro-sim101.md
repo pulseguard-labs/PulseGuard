@@ -54,6 +54,22 @@ Somente depois de concluir e registrar as etapas anteriores:
 - [ ] Confirme entradas, stop, saídas, travas, flatten e logs no Control Center.
 - [ ] Desabilite a estratégia e restaure `EnableAutomaticTrading = false` ao terminar.
 
+## 7. Verificação de versão (informativa)
+
+Execute esta seção apenas em Playback/Sim101 e sem alterar os padrões de segurança. A consulta deve afetar somente o texto exibido/logado, nunca ordens.
+O repositório público ainda não tem `version.json` publicado em `main`; os cenários online devem ser repetidos após a publicação desse manifesto.
+
+- [ ] Online, manifesto válido e versões iguais: status “Atualizado”.
+- [ ] Em ambiente de teste isolado, manifesto com versão superior: status “Atualização disponível” e orientação para consultar Releases.
+- [ ] Sem internet: status “Não verificado”; estratégia e gestão continuam funcionando normalmente.
+- [ ] Manifesto malformado ou com campos obrigatórios ausentes: status “Não verificado”, sem exceção propagada.
+- [ ] `CheckForUpdates = false`: status “Desligado” e nenhuma requisição de rede.
+- [ ] Adicione estratégia e indicador juntos: confirmar consulta compartilhada/cache sem requisições repetidas.
+- [ ] Reabra a workspace/gráfico: confirmar uma checagem por carregamento e sem repetição por barra/tick.
+- [ ] Inspecione o dashboard em temas claro e escuro, com `ShowVersionPanel` ligado e desligado.
+- [ ] Compare ordens, horários e latência antes/depois; nenhuma ordem pode ser criada, removida ou atrasada pela checagem.
+- [ ] Informe manualmente `TemplateVersion`; confirme que o painel não afirma detectar o template automaticamente.
+
 ## Critérios de encerramento
 
 - [ ] Nenhum erro de compilação ou estado inesperado sem triagem.

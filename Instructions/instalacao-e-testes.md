@@ -5,12 +5,13 @@ Instruções para instalar `MACDNG` e `PulseGuardStrategy` no NinjaTrader 8 (NT8
 ## Instalação
 
 1. Desabilite a estratégia nos gráficos e faça backup de qualquer script existente que será atualizado.
-2. Copie `Indicator/MACDNG.cs` para `Documents\NinjaTrader 8\bin\Custom\Indicators\MACDNG.cs`.
+2. Copie `Indicator/MACDNG.cs`, `Indicator/PulseGuardVersion.cs` e `Indicator/PulseGuardUpdateChecker.cs` para `Documents\NinjaTrader 8\bin\Custom\Indicators\`.
 3. Copie `Strategy/PulseGuardStrategy.cs` para `Documents\NinjaTrader 8\bin\Custom\Strategies\PulseGuardStrategy.cs`.
 4. Se a instalação já tiver `MACDNG`, atualize a implementação existente em vez de criar outra. Deve haver apenas uma classe `MACDNG` em `NinjaTrader.NinjaScript.Indicators`.
 5. Arquive a cópia anterior da estratégia após fazer backup e confirmar que nenhuma workspace ou automação ainda depende dela.
 6. Abra **New > NinjaScript Editor**, compile todos os scripts e confirme que não há erros. A compilação NinjaScript pode gerar assinaturas/wrappers que não fazem parte do fonte principal do indicador.
-7. Só depois de compilar sem erros, adicione `PulseGuardStrategy` a um gráfico de simulação e confira o painel, indicador, médias e Output.
+7. Se o compilador informar referências ausentes, adicione as assemblies do .NET Framework 4.8 `System.Net.Http.dll` e `System.Web.Extensions.dll` nas referências do NinjaScript Editor. Elas são usadas para TLS 1.2 isolado no cliente HTTP e para ler o JSON; não instale pacotes de terceiros.
+8. Só depois de compilar sem erros, adicione `PulseGuardStrategy` a um gráfico de simulação e confira o painel, indicador, médias e Output.
 
 O caminho de dados pode variar conforme a instalação. Use o diretório `bin\Custom` da instalação ativa do NinjaTrader.
 
@@ -33,6 +34,8 @@ Parâmetros e travas estão descritos em [parâmetros e segurança](parametros-e
 5. **Gestão:** teste posições long/short, saídas técnicas, posição já existente na conta, zeragem pelo horário e encerramento de sessão.
 6. **Fuso:** compare horário da barra, relógio local, Output e ET. Repita em datas representativas de horário padrão e horário de verão dos EUA.
 7. **Estabilidade:** recarregue dados, alterne gráficos e examine o Log/Trace antes de habilitar qualquer automação.
+8. **Versões:** com `CheckForUpdates = true`, verifique o status assíncrono e, com `ShowVersionPanel = true`, as versões e status no dashboard. O template aplicado deve ser informado em `TemplateVersion`; não há detecção automática.
+9. **Offline:** teste a falha de rede e confirme “Não verificado”, sem erros propagados, alteração de ordens ou bloqueio da estratégia. Desligue `CheckForUpdates` na estratégia e confirme “Desligado” para os componentes incluídos; no indicador usado sozinho, desligue sua própria opção.
 
 Registre instrumento, tipo/valor de barra, Trading Hours, fuso e versão NT8 utilizados no teste. Não use conta real para validar mudanças.
 
@@ -43,3 +46,9 @@ Não sincronize arquivos enquanto a compilação não estiver limpa. Faça backu
 ## Limitações
 
 A compilação no editor NinjaScript e o comportamento em Replay/Sim101 dependem da instalação local, feed e dados disponíveis; uma compilação externa não substitui essa validação. Resultados de backtest/simulação não garantem resultados futuros.
+
+## Validação do verificador de versões
+
+Execute `scripts/check-versions.ps1` e `scripts/test-versioning.ps1` para validar manifesto, SemVer e parser. A URL consulta somente `version.json` público em `main`; até esse arquivo ser publicado, ou se a rede estiver indisponível, o status esperado é “Não verificado”. A requisição tem timeout de 5 segundos, cache compartilhado de 15 minutos, TLS 1.2 no handler e não baixa nem instala software.
+
+Faça os casos de Playback/Sim101 descritos em [`../Tests/roteiro-sim101.md`](../Tests/roteiro-sim101.md). A checagem começa em `State.DataLoaded`, não é executada a cada barra e não deve modificar nem atrasar ordens. A compilação NinjaScript e o teste visual em tema claro/escuro continuam pendentes de validação manual local.

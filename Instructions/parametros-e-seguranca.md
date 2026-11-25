@@ -46,3 +46,11 @@ Confirme o horário da barra e o ET no HUD/Output, o Trading Hours template e a 
 ## Revisão de mudanças
 
 Toda alteração que afete envio de ordens, stop, limites de conta, gestão de posição ou cálculo de horário deve incluir justificativa, revisão explícita de segurança e teste em Replay/Sim101. Compare os defaults antes/depois e mantenha a estratégia sem automação por padrão.
+
+## Verificação informativa de versões
+
+- `CheckForUpdates = true` habilita consultas assíncronas ao manifesto público. Na estratégia, `false` desliga as consultas do robô, do `MACDNG` incluído e do template; no indicador usado sozinho, a propriedade controla a própria consulta. Falhas de conexão resultam em “Não verificado” e não bloqueiam a estratégia.
+- `ShowVersionPanel = true` exibe versões e status no dashboard da estratégia. Desligar essa opção oculta somente as linhas de versão.
+- `TemplateVersion` deve ser preenchida manualmente com a versão do template aplicado. O NinjaTrader não oferece detecção segura automática a partir do XML atual.
+- A consulta lê somente texto de `version.json`, usa TLS 1.2 e cache de 15 minutos; não baixa, instala, executa ou compila código e não altera as regras de ordens.
+- Os logs registram somente o resultado resumido. Não inclua credenciais ou dados pessoais no manifesto, código ou relatórios.

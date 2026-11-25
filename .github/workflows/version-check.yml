@@ -1,0 +1,17 @@
+name: Version consistency
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check-versions:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate manifest and component versions
+        shell: pwsh
+        run: ./scripts/check-versions.ps1
+      - name: Test SemVer and manifest parser
+        shell: pwsh
+        run: ./scripts/test-versioning.ps1

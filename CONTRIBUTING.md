@@ -25,4 +25,6 @@ O PR deve demonstrar compilação limpa no NinjaScript Editor compatível e, qua
 
 Revisores devem verificar escopo, compatibilidade NinjaTrader, defaults de segurança, dados sensíveis e alterações no horário ET. Mudanças de risco/ordens requerem revisão explícita antes de merge.
 
+Ao publicar uma versão, atualize as constantes centralizadas, `version.json` e o topo do `CHANGELOG.md`; use SemVer e execute `scripts/check-versions.ps1` e `scripts/test-versioning.ps1`. Consulte [`docs/RELEASE.md`](docs/RELEASE.md) para o fluxo completo. O verificador remoto é somente informativo e nunca instala atualizações.
+
 Novos presets devem separar valores de instrumento/série das regras gerais da estratégia, documentar unidades e ser testados em simulação. Vídeos comunitários devem usar links públicos verificados e não mostrar dados de conta ou habilitar live trading.
