@@ -1,0 +1,28 @@
+# Local NinjaTrader data and trading records
+NT/
+
+# Build output and compiled NinjaScript exports
+bin/
+obj/
+.vs/
+*.dll
+*.pdb
+*.exe
+*.zip
+*.cache
+*.log
+*.tmp
+
+# Local editor and user settings
+*.user
+*.suo
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+secrets/
+*.key
+*.pem
+*.pfx
+*.p12
