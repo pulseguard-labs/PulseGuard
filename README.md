@@ -1,5 +1,7 @@
 # PulseGuard
 
+> **Aviso de Risco:** Operar no mercado financeiro envolve alto risco de perda e volatilidade imprevisível. **Não há garantia de resultados**, e **resultados passados não garantem resultados futuros**. Este código tem caráter educacional e experimental — teste sempre em simulador e leia o [`DISCLAIMER.md`](./DISCLAIMER.md) completo antes de qualquer uso.
+
 PulseGuard is an open-source NinjaTrader 8 (NT8) NinjaScript project for MACD-based signals and configurable strategy/risk management. It is not financial advice or a promise of performance.
 
 ## Architecture
