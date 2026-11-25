@@ -7,15 +7,34 @@ PulseGuard is an open-source NinjaTrader 8 (NT8) NinjaScript project for MACD-ba
 ## Architecture
 
 - [`Indicator/MACDNG.cs`](Indicator/MACDNG.cs) — reusable `MACDNG` indicator in `NinjaTrader.NinjaScript.Indicators`; it is not tied to an instrument or strategy.
+- [`Indicator/PulseGuardVersion.cs`](Indicator/PulseGuardVersion.cs) and [`version.json`](version.json) — installed and published component versions.
+- [`Indicator/PulseGuardUpdateChecker.cs`](Indicator/PulseGuardUpdateChecker.cs) — asynchronous, informational version check; it never downloads or installs software.
 - [`Strategy/PulseGuardStrategy.cs`](Strategy/PulseGuardStrategy.cs) — `PulseGuardStrategy` in `NinjaTrader.NinjaScript.Strategies`.
 - [`Instructions/`](Instructions/) — installation, testing, parameter and safety guides.
 - [`Presets/`](Presets/) — documented simulator-only reference configuration.
-- [`Templates/`](Templates/) — reusable preset and simulator-report templates.
+- [`Templates/`](Templates/) — NinjaTrader 8 chart templates, their review trail, and simulator-only test documentation.
 - [`Tests/`](Tests/) — practical Sim101 validation checklist.
 - [`Videos/`](Videos/) — recommended community video learning path; YouTube links are placeholders until verified URLs are available.
 - [`.github/`](.github/) — issue and pull request templates for community collaboration.
 
 The strategy's instrument and Renko type/value validations are optional and disabled by default. `BrickSizeTicks` remains an independent input to internal barrier and breakeven calculations; changing or disabling chart validation does not infer a suitable value.
+
+## Chart templates
+
+The chart-template source of truth is XML. The matching `.xtpl` files have identical content and are provided for NinjaTrader 8 installation in `Documents\NinjaTrader 8\templates\Chart\`.
+
+- [`preset-template-60R-light-v0.1.0.xml`](Templates/preset-template-60R-light-v0.1.0.xml) / [`preset-template-60R-light-v0.1.0.xtpl`](Templates/preset-template-60R-light-v0.1.0.xtpl) — revised light theme.
+- [`preset-template-60R-dark-v0.1.0.xml`](Templates/preset-template-60R-dark-v0.1.0.xml) / [`preset-template-60R-dark-v0.1.0.xtpl`](Templates/preset-template-60R-dark-v0.1.0.xtpl) — equivalent dark theme, with high-contrast blue/orange candles.
+- [`backup/preset-template-60R-light.original.xml`](Templates/backup/preset-template-60R-light.original.xml) — byte-for-byte preservation copy of the original exported template.
+- [`AUDITORIA.md`](Templates/AUDITORIA.md), [`PENDENCIAS.md`](Templates/PENDENCIAS.md), and [`diff-light-dark.md`](Templates/diff-light-dark.md) — static audit, manual-test requirements, and controlled visual diff.
+
+The templates retain the exported MNQ DEC26 instrument, Renko value 60, ATM `100-200`, quantity `1`, and TIF `Day`. They do not enable live trading or contain accounts, credentials, or automatic trading settings. Apply and validate them only in Playback/Sim101; after rollover, select the appropriate contract in NinjaTrader 8.
+
+The active time highlighter is 14:30–17:00 in the time zone configured in NinjaTrader 8. Its intended ET/local interpretation, daylight-saving behavior, XML import acceptance, chart scale, and Chart Trader appearance remain pending manual validation. No MACD XML is embedded: see [`Templates/PENDENCIAS.md`](Templates/PENDENCIAS.md) for the required real NT8 export workflow.
+
+## Component versioning
+
+The version check reads only the public `version.json` manifest on `main`; until that manifest is published there, the status remains **Não verificado**. The check is asynchronous, uses a shared 15-minute cache, and does not change order behavior. The strategy's `CheckForUpdates` setting controls its own, embedded-indicator, and template checks; a standalone indicator has its own setting. The template version is entered manually because chart-template XML cannot be safely inspected at runtime. See [`docs/RELEASE.md`](docs/RELEASE.md) for SemVer, validation, and NinjaTrader assembly-reference requirements.
 
 ## Quick start
 
